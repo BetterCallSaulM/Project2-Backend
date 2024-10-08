@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-rlons5wt-=_c+45k_rfb6m&!*=2(lu=y=jc-s+%s+*-4!4f!in
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,12 +77,11 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'NAME' : 'project2',
-        'USER': 'saul',
-        'PASSWORD': 'Jacoba11',
-        'HOST': 'localhost',
-        'PORT': '3307',  # Port I changed it to
+        'NAME' : 're59ypr3dypthoi8',
+        'USER': 'x3w4tt2hxirh613q',
+        'PASSWORD': 'rw65ihmgvsvyi0bc',
+        'HOST': 'q0h7yf5pynynaq54.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',  # Port I changed it to is 3307
     }
 }
 
