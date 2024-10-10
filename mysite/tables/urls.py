@@ -5,9 +5,10 @@ from .views import *
 router = routers.DefaultRouter()
 
 router.register(r'Users', UserViewSet)
+router.register(r'Movies', MovieViewSet)
+router.register(r'Watchlists', WatchlistViewSet)
 
 urlpatterns = [
-    #path("", views.index, name="index"),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls'))
 ]
