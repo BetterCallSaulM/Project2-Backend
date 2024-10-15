@@ -23,6 +23,9 @@ RUN pip install -r requirements.txt
 # Change working directory in the container
 WORKDIR /app/mysite
 
+# Collect Static files
+RUN python manage.py collectstatic --noinput
+
 # Run the Django app
 CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:$PORT mysite.wsgi:application"]
 

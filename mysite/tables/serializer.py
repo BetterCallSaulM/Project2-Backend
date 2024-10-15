@@ -9,12 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['movie_id', 'title', 'releaseDate', 'year', 'director', 'genre']
+        fields = ['movie_id', 'title', 'year', 'director', 'genre', 'poster']
 
 class WatchlistSerializer(serializers.ModelSerializer):
-    username = serializers.StringRelatedField()  # This can be changed to UserSerializer if you want detailed user data
-    movie_id = MovieSerializer()
+    username = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())  # ForeignKey to User
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())  # ForeignKey to User
 
     class Meta:
         model = Watchlist
-        fields = ['watchlist_id', 'username', 'movie_id', 'status']
+        fields = ['watchlist_id', 'watchlist_name', 'username', 'movie', 'status']
