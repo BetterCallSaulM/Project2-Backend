@@ -75,6 +75,36 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['PATCH'], url_path='update')
+    def update_user(self, request):
+        username = request.query_params.get('username')
+
+        if not username:
+            return Response({'error': 'Username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        new_username = request.query_params.get('new_username')
+        if new_username is not None:
+            if User.objects.filter(username=new_username).exists():
+                return Response({'error': 'Username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.username = new_username
+        
+        password = request.query_params.get('password')
+        if password is not None:
+            user.password = password
+        
+        is_admin = request.query_params.get('is_admin')
+        if is_admin is not None:
+            user.is_admin = is_admin.lower() == 'true'
+
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()

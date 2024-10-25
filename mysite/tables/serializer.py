@@ -4,7 +4,7 @@ from .models import User, Movie, Watchlist
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password']  
+        fields = ['user_id', 'username', 'password', 'is_admin']  
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,8 +12,8 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = ['movie_id', 'title', 'year', 'director', 'genre', 'poster']
 
 class WatchlistSerializer(serializers.ModelSerializer):
-    username = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())  # ForeignKey to User
-    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())  # ForeignKey to User
+    username = serializers.StringRelatedField()
+    movie = serializers.StringRelatedField()
 
     class Meta:
         model = Watchlist
