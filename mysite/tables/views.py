@@ -151,6 +151,7 @@ class MovieViewSet(viewsets.ModelViewSet):
         year = request.query_params.get('year', Movie._meta.get_field('year').get_default())
         director = request.query_params.get('director', Movie._meta.get_field('director').get_default())
         genre = request.query_params.get('genre', Movie._meta.get_field('genre').get_default())
+        description = request.query_params.get('description', Movie._meta.get_field('description').get_default())
         poster = request.query_params.get('poster', Movie._meta.get_field('poster').get_default())
 
         movie_data = {
@@ -158,6 +159,7 @@ class MovieViewSet(viewsets.ModelViewSet):
             'year' : year,
             'director' : director,
             'genre' : genre,
+            'description' : description,
             'poster' : poster
         }
         serializer = MovieSerializer(data=movie_data)
