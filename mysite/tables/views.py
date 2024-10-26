@@ -65,7 +65,7 @@ class UserViewSet(viewsets.ModelViewSet):
         username = request.query_params.get('username')
         password = request.query_params.get('password')
 
-        if not username or password:
+        if not username or not password:
             return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
