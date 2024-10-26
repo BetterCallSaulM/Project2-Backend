@@ -62,13 +62,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['DELETE'], url_path='delete')
     def delete_user(self, request):
-        username = request.query_params.get('username')  
+        username = request.query_params.get('username')
+        password = request.query_params.get('password')
 
-        if not username:
-            return Response({'error': 'Username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not username or password:
+            return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            user_data = User.objects.get(username=username)
+            user_data = User.objects.get(username=username, password=password)
             user_data.delete()
             return Response({'message' : 'User deleted successfully'}, status=status.HTTP_202_ACCEPTED)
         except User.DoesNotExist:
