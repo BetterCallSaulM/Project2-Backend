@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['movie_id', 'title', 'year', 'director', 'genre', 'poster']
+        fields = ['movie_id', 'title', 'year', 'director', 'genre', 'description', 'poster']
 
 class WatchlistSerializer(serializers.ModelSerializer):
     username = serializers.StringRelatedField()

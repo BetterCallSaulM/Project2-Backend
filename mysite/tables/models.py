@@ -16,6 +16,7 @@ class Movie(models.Model):
     year = models.IntegerField(null=True)
     director = models.CharField(max_length=50, default='', blank=True)
     genre = models.CharField(max_length=50, default='', blank=True)
+    description = models.CharField(max_length=1000, default='', blank=True)
     poster = models.CharField(max_length=200, default='', blank=True)
 
     def __str__(self):
