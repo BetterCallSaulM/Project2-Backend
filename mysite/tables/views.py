@@ -287,7 +287,7 @@ class WatchlistMovieViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Watchlist id required'})
         
         try:
-            movies = Watchlist.objects.filter(watchlist=watchlist).values()
+            movies = WatchlistMovie.objects.filter(watchlist_id=watchlist).values()
             return Response({'Movies': movies}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
