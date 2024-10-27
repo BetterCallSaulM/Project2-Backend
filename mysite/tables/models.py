@@ -25,9 +25,16 @@ class Movie(models.Model):
 class Watchlist(models.Model):
     watchlist_id = models.AutoField(primary_key=True)
     watchlist_name = models.CharField(max_length=50, default='', blank=True)
-    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.watchlist_name} ({self.user_id})'
+    
+class WatchlistMovie(models.Model):
+    id = models.AutoField(primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    watchlist = models.ForeignKey(Watchlist, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, default='Not Watched')
 
     def __str__(self):
-        return f'{self.watchlist_name} ({self.username})'
+        return f'{self.movie} ({self.watchlist})'

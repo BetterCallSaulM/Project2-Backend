@@ -1,10 +1,8 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import User, Movie, Watchlist
-from .serializer import UserSerializer, MovieSerializer, WatchlistSerializer
+from .models import User, Movie, Watchlist, WatchlistMovie
+from .serializer import UserSerializer, MovieSerializer, WatchlistSerializer, WatchlistMovieSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -215,6 +213,10 @@ class MovieViewSet(viewsets.ModelViewSet):
         if genre is not None:
             movie.genre = genre
 
+        description = request.query_params.get('description')
+        if description is not None:
+            movie.description = description
+
         poster = request.query_params.get('poster')
         if poster is not None:
             movie.poster = poster
@@ -227,18 +229,99 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     queryset = Watchlist.objects.all()
     serializer_class = WatchlistSerializer
 
-    @action(detail=False, methods=['GET'], url_path='list')
-    def get_list(self, request):
-        list_name = request.query_params.get('list_name')
-        username = request.query_params.get('user')
+    @action(detail=False, methods=['GET'], url_path='lists')
+    def get_distinct_watchlist_names(self, request):
+        user = request.query_params.get('user')
 
-        if not list_name or not username:
-            return Response({'error' : 'List name and username required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not user:
+            return Response({'error': 'User id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            watchlists = Watchlist.objects.filter(user_id=user).values()
+            return Response({'Watchlists': watchlists}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['POST'], url_path='newlist')
+    def create_wishlist(self, request):
+        name = request.query_params.get('name')
+        user = request.query_params.get('user')
+
+        if not name or not user:
+            return Response({'error': 'Name and user_id are required'})
+        
+        wishlist_data = {'watchlist_name': name, 'user_id' : user}
+        serializer = WatchlistSerializer(data=wishlist_data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['DELETE'], url_path='delete')
+    def delete_watchlist(self, request):
+        watchlist = request.query_params.get('watchlist')
+
+        if not watchlist:
+            return Response({'error': 'Watchlist id is required'})
         
         try:
-            list_data = Watchlist.objects.filter(watchlist_name=list_name, username=username).values()
-            return Response({'message' : 'List retrieved successfully', 'watchlist' : list_data}, status=status.HTTP_202_ACCEPTED)
+            watchlist_data = Watchlist.objects.get(watchlist_id=watchlist)
+            watchlist_data.delete()
+            return Response({'message' : 'Watchlist deleted successfully'}, status=status.HTTP_202_ACCEPTED)
         except Watchlist.DoesNotExist:
             return Response({'error': 'Watchlist not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+class WatchlistMovieViewSet(viewsets.ModelViewSet):
+    queryset = WatchlistMovie.objects.all()
+    serializer_class = WatchlistMovieSerializer
+
+    @action(detail=False, methods=['GET'], url_path='movies')
+    def get_movies(self, request):
+        watchlist = request.query_params.get('watchlist')
+
+        if not watchlist:
+            return Response({'error': 'Watchlist id required'})
+        
+        try:
+            movies = Watchlist.objects.filter(watchlist=watchlist).values()
+            return Response({'Movies': movies}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['POST'], url_path='add')
+    def add_to_list(self, request):
+        movie = request.query_params.get('movie')
+        watchlist = request.query_params.get('watchlist')
+        watch_status = request.query_params.get('status')
+
+        if not movie or not watchlist or not status:
+            return Response({'error': 'Movie id, Watchlist id, and status required'})
+        
+        item_data = {'movie': movie, 'watchlist': watchlist, 'status':watch_status}
+        serializer = WatchlistMovieSerializer(data=item_data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['DELETE'], url_path='delete')
+    def delete_from_watchlist(self, request):
+        id = request.query_params.get('id')
+
+        if not id:
+            return Response({'error': 'ID required'})
+        
+        try:
+            movie_data = WatchlistMovie.objects.get(id=id)
+            movie_data.delete()
+            return Response({'message' : 'Movie removed from watchlist successfully'}, status=status.HTTP_202_ACCEPTED)
+        except WatchlistMovie.DoesNotExist:
+            return Response({'error': 'Movie not found in Watchlist'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
