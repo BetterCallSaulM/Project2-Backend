@@ -298,10 +298,10 @@ class WatchlistMovieViewSet(viewsets.ModelViewSet):
         watchlist = request.query_params.get('watchlist')
         watch_status = request.query_params.get('status')
 
-        if not movie or not watchlist or not status:
+        if not movie or not watchlist or not watch_status:
             return Response({'error': 'Movie id, Watchlist id, and status required'})
         
-        item_data = {'movie': movie, 'watchlist': watchlist, 'status':watch_status}
+        item_data = {'movie': movie, 'watchlist': watchlist, 'status': watch_status}
         serializer = WatchlistMovieSerializer(data=item_data)
 
         if serializer.is_valid():
